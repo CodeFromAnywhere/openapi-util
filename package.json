@@ -2,7 +2,7 @@
   "name": "openapi-util",
   "type": "module",
   "main": "build/index.js",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "scripts": {
     "css": "tailwindcss -o css.css",
     "tsc": "tsc",
