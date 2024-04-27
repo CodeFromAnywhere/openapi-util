@@ -1,17 +1,16 @@
 import { notEmpty } from "from-anywhere";
 import { OpenAPIV3 } from "openapi-types";
-import {
-  OpenapiOperationObject,
-  OpenapiSchemaObject,
-} from "./openapi-types.js";
+import { resolveReferenceOrContinue } from "./resolveReferenceOrContinue.js";
 
-/** Responds with the operations from an openapi document by looking in the paths and (next)-allowed methods
+/**
+ * Responds with the operations from an openapi document by looking in the paths and (next)-allowed methods
  *
- * The openapi is generic to allow for extensions (like ActionSchema)
+ * TODO:Ensure `getOperations` resolves every `component/schemas` and remote ones. Maybe it's possible to do with some redocly function (or continue from `resolveResource`)
  */
-export const getOperations = <T extends OpenAPIV3.Document>(
-  openapi: T,
+export const getOperations = async (
+  openapi: OpenAPIV3.Document,
   openapiId?: string,
+  documentLocation?: string,
 ) => {
   const allowedMethods = [
     "get",
@@ -22,43 +21,62 @@ export const getOperations = <T extends OpenAPIV3.Document>(
     "head",
     "options",
   ];
-  // TODO: we need the operations including all references. we're loosing components here!!!
 
-  const operations = Object.keys(openapi.paths)
-    .map((path) => {
-      const item = openapi.paths![
-        path as keyof typeof openapi.paths
-      ] as OpenAPIV3.Document["paths"][string];
+  const operations = (
+    await Promise.all(
+      Object.keys(openapi.paths).map(async (path) => {
+        const item: OpenAPIV3.PathItemObject | undefined =
+          openapi.paths![path as keyof typeof openapi.paths];
 
-      if (!item) {
-        return;
-      }
+        if (!item) {
+          return;
+        }
 
-      const methods = Object.keys(item).filter((method) =>
-        allowedMethods.includes(method),
-      );
-      const pathMethods = methods.map((method) => {
-        const operation = item[
-          method as keyof typeof item
-        ] as OpenapiOperationObject;
+        const methods = Object.keys(item).filter((method) =>
+          allowedMethods.includes(method),
+        );
 
-        // Get it fully resolved from the openapi. Do some research to find this function
-        const resolvedRequestBodySchema: OpenapiSchemaObject = {};
+        const pathMethods = await Promise.all(
+          methods.map(async (method) => {
+            const operation = item[
+              method as keyof typeof item
+            ] as OpenAPIV3.OperationObject;
 
-        // TODO: supply the parameters (item.parameters)
+            // TODO: Get them resolved
+            const parameters = operation.parameters || item.parameters;
 
-        return {
-          openapiId,
-          path,
-          method,
-          operation,
-          resolvedRequestBodySchema,
-          id: operation.operationId || path + "=" + method,
-        };
-      });
+            const schema = await resolveReferenceOrContinue(
+              (
+                await resolveReferenceOrContinue(
+                  operation.requestBody,
+                  openapi,
+                  documentLocation,
+                )
+              ).content["application/json"].schema,
+              openapi,
+              documentLocation,
+            );
 
-      return pathMethods;
-    })
+            // TODO: Get it fully resolved from the openapi. Do some research to find this function
+            const resolvedRequestBodySchema: OpenAPIV3.SchemaObject = schema;
+
+            const id = operation.operationId || path + "=" + method;
+            return {
+              openapiId,
+              path,
+              method,
+              operation,
+              parameters,
+              resolvedRequestBodySchema,
+              id,
+            };
+          }),
+        );
+
+        return pathMethods;
+      }),
+    )
+  )
     .filter(notEmpty)
     .flat();
 

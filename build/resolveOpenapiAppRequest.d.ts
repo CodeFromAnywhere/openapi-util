@@ -1,5 +1,4 @@
 import { OpenapiDocument } from "./openapi-types";
-import { Json } from "from-anywhere";
 /**
  * Function that turns a regular function into an endpoint. If the function is available in the OpenAPI (with function name equalling the operationId), the input will be validated.
  *
@@ -8,7 +7,7 @@ import { Json } from "from-anywhere";
 export declare const resolveOpenapiAppRequest: (request: Request, method: string, config: {
     openapi: OpenapiDocument;
     functions: {
-        [functionName: string]: (jsonBody: any) => Json | undefined | Promise<Json | undefined>;
+        [functionName: string]: (jsonBody: any) => any | Promise<any>;
     };
 }) => Promise<Response>;
 //# sourceMappingURL=resolveOpenapiAppRequest.d.ts.map

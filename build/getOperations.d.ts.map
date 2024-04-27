@@ -1,1 +1,1 @@
-{"version":3,"file":"getOperations.d.ts","sourceRoot":"","sources":["../src/getOperations.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,SAAS,EAAE,MAAM,eAAe,CAAC;AAM1C;;;GAGG;AACH,eAAO,MAAM,aAAa,6DAEZ,MAAM;;;;;;;;;;;;;;;;;;;;;;GAoDnB,CAAC"}
+{"version":3,"file":"getOperations.d.ts","sourceRoot":"","sources":["../src/getOperations.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,SAAS,EAAE,MAAM,eAAe,CAAC;AAG1C;;;;GAIG;AACH,eAAO,MAAM,aAAa,YACf,kBAAkB,cACf,MAAM,qBACC,MAAM;;;;;;;;;;;;;;;;;;;;;;;IAuE1B,CAAC"}

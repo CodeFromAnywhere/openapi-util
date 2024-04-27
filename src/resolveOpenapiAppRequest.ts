@@ -14,9 +14,7 @@ export const resolveOpenapiAppRequest = async (
   config: {
     openapi: OpenapiDocument;
     functions: {
-      [functionName: string]: (
-        jsonBody: any,
-      ) => Json | undefined | Promise<Json | undefined>;
+      [functionName: string]: (jsonBody: any) => any | Promise<any>;
     };
   },
 ) => {

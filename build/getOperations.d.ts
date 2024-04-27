@@ -1,9 +1,10 @@
 import { OpenAPIV3 } from "openapi-types";
-/** Responds with the operations from an openapi document by looking in the paths and (next)-allowed methods
+/**
+ * Responds with the operations from an openapi document by looking in the paths and (next)-allowed methods
  *
- * The openapi is generic to allow for extensions (like ActionSchema)
+ * TODO:Ensure `getOperations` resolves every `component/schemas` and remote ones. Maybe it's possible to do with some redocly function (or continue from `resolveResource`)
  */
-export declare const getOperations: <T extends OpenAPIV3.Document<{}>>(openapi: T, openapiId?: string) => {
+export declare const getOperations: (openapi: OpenAPIV3.Document, openapiId?: string, documentLocation?: string) => Promise<{
     openapiId: string | undefined;
     path: string;
     method: string;
@@ -23,7 +24,8 @@ export declare const getOperations: <T extends OpenAPIV3.Document<{}>>(openapi: 
         security?: OpenAPIV3.SecurityRequirementObject[] | undefined;
         servers?: OpenAPIV3.ServerObject[] | undefined;
     };
-    resolvedRequestBodySchema: OpenAPIV3.NonArraySchemaObject;
+    parameters: (OpenAPIV3.ReferenceObject | OpenAPIV3.ParameterObject)[] | undefined;
+    resolvedRequestBodySchema: OpenAPIV3.SchemaObject;
     id: string;
-}[];
+}[]>;
 //# sourceMappingURL=getOperations.d.ts.map
