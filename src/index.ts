@@ -5,3 +5,4 @@ export * from "./resolveReferenceOrContinue.js";
 export * from "./resolveResource.js";
 export * from "./tryGetOperationBodySchema.js";
 export * from "./tryValidateSchema.js";
+export * from "./fetchOpenapi.js";
