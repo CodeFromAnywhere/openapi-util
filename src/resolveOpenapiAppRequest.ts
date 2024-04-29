@@ -129,6 +129,7 @@ export const resolveOpenapiAppRequest = async (
       )
     : undefined;
 
+  console.log({ operation, match });
   const schema = await tryGetOperationBodySchema(openapi, operation);
 
   if (!schema) {
