@@ -11,6 +11,9 @@ export const tryGetOperationBodySchema = async (
   operation: OpenapiOperationObject,
   documentLocation?: string,
 ) => {
+  if (!operation.requestBody) {
+    return;
+  }
   try {
     const requestBody = await resolveReferenceOrContinue(
       operation.requestBody,

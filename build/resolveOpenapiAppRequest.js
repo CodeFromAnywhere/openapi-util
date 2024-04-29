@@ -79,23 +79,10 @@ export const resolveOpenapiAppRequest = async (request, method, config) => {
         }))
         : undefined;
     const schema = await tryGetOperationBodySchema(openapi, operation);
-    if (!schema) {
-        return Response.json("Schema not found", {
-            status: 404,
-            headers: defaultHeaders,
-        });
-    }
-    if (request.headers.get("content-type") !== "application/json") {
-        return Response.json({
-            isSuccessful: false,
-            message: "Please specify content-type header to be application/json",
-        }, {
-            status: 422,
-            headers: defaultHeaders,
-        });
-    }
-    const data = request.body;
-    const errors = tryValidateSchema({ schema, data });
+    const data = request.headers.get("content-type") === "application/json"
+        ? request.body
+        : undefined;
+    const errors = schema ? tryValidateSchema({ schema, data }) : undefined;
     // validate this schema and return early if it fails
     if (errors && errors.length > 0) {
         return Response.json({
@@ -116,10 +103,10 @@ export const resolveOpenapiAppRequest = async (request, method, config) => {
             headers: defaultHeaders,
         });
     }
-    const context = Object.keys(match.context).length > 0 &&
-        typeof data === "object" &&
-        data !== null
-        ? { ...data, ...match.context, ...queryParams, ...headers }
+    const pathParams = Object.keys(match.context).length > 0 ? match.context : undefined;
+    // TODO: figure out how to accept non-object parameters and also headers / query params, etc.
+    const context = typeof data === "object" && data !== null
+        ? { ...data, ...pathParams, ...queryParams, ...headers }
         : data;
     console.log({ context });
     // valid! Let's execute.
