@@ -1,3 +1,5 @@
+import { mergeObjectsArray } from "from-anywhere";
+import { makeOpenapiPathRouter } from "./makeOpenapiPathRouter.js";
 import { tryGetOperationBodySchema } from "./tryGetOperationBodySchema.js";
 import { tryValidateSchema } from "./tryValidateSchema.js";
 /**
@@ -14,45 +16,38 @@ export const resolveOpenapiAppRequest = async (request, method, config) => {
     };
     const url = request.url;
     const urlObject = new URL(url);
-    const pathname = urlObject.pathname;
+    const requestPathname = urlObject.pathname;
     // basePath may depend on openapi server
-    const basePath = openapi.servers?.[0]?.url || urlObject.origin;
-    const restPathname = url.slice(basePath.length);
-    const openapiPathname = restPathname;
-    // TODO: Match restPathname against the paths
-    // DISABLED Path validation for now, until we implement it
-    // const operation = (openapi as any).paths?.[pathname]?.[method] as
-    //   | undefined
-    //   | {};
-    // if (!operation) {
-    //   const allowedMethods = [
-    //     "get",
-    //     "post",
-    //     "put",
-    //     "patch",
-    //     "delete",
-    //     "head",
-    //     "options",
-    //   ];
-    //   const methods = mergeObjectsArray(
-    //     Object.keys(openapi.paths).map((path) => {
-    //       return {
-    //         [path]: Object.keys((openapi as any).paths[path]).filter((method) =>
-    //           allowedMethods.includes(method),
-    //         ),
-    //       };
-    //     }),
-    //   );
-    //   return Response.json(
-    //     {
-    //       message: `Invalid method. More info at ${urlObject.origin}/${key}.json`,
-    //       methods,
-    //       openapiPath,
-    //     },
-    //     defaultResponseInit,
-    //   );
-    // }
-    const operation = openapi.paths?.[openapiPathname]?.[method];
+    const serverUrl = openapi.servers?.[0]?.url || urlObject.origin;
+    const serverBasePathname = new URL(serverUrl).pathname;
+    const restPathname = "/" + requestPathname.slice(serverBasePathname.length);
+    const router = makeOpenapiPathRouter(openapi);
+    const match = router(restPathname);
+    if (!match) {
+        const allowedMethods = [
+            "get",
+            "post",
+            "put",
+            "patch",
+            "delete",
+            "head",
+            "options",
+        ];
+        const methods = mergeObjectsArray(Object.keys(openapi.paths).map((path) => {
+            return {
+                [path]: Object.keys(openapi.paths[path]).filter((method) => allowedMethods.includes(method)),
+            };
+        }));
+        return Response.json({
+            message: `Invalid method.`,
+            methods,
+            restPathname,
+        }, {
+            status: 404,
+            headers: defaultHeaders,
+        });
+    }
+    const operation = openapi.paths?.[match.path]?.[method];
     if (!operation) {
         return Response.json("Endpoint not found", {
             status: 404,
@@ -89,7 +84,7 @@ export const resolveOpenapiAppRequest = async (request, method, config) => {
             headers: defaultHeaders,
         });
     }
-    const operationId = operation.operationId || openapiPathname + "=" + method;
+    const operationId = operation.operationId || match.path + "=" + method;
     const fn = functions[operationId];
     if (!fn) {
         return Response.json("Function not found", {
@@ -97,8 +92,13 @@ export const resolveOpenapiAppRequest = async (request, method, config) => {
             headers: defaultHeaders,
         });
     }
+    const context = Object.keys(match.context).length > 0 &&
+        typeof data === "object" &&
+        data !== null
+        ? { ...data, ...match.context }
+        : data;
     // valid! Let's execute.
-    const resultJson = await fn(data);
+    const resultJson = await fn(context);
     return Response.json(resultJson, {
         status: 200,
         headers: defaultHeaders,
