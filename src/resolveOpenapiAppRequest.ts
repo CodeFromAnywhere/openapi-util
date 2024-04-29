@@ -1,8 +1,13 @@
 import { Json, mergeObjectsArray } from "from-anywhere";
 import { makeOpenapiPathRouter } from "./makeOpenapiPathRouter.js";
-import { OpenapiDocument, OpenapiOperationObject } from "./openapi-types.js";
+import {
+  OpenapiDocument,
+  OpenapiOperationObject,
+  OpenapiPathItemObject,
+} from "./openapi-types.js";
 import { tryGetOperationBodySchema } from "./tryGetOperationBodySchema.js";
 import { tryValidateSchema } from "./tryValidateSchema.js";
+import { resolveReferenceOrContinue } from "./resolveReferenceOrContinue.js";
 
 /**
  * Function that turns a regular function into an endpoint. If the function is available in the OpenAPI (with function name equalling the operationId), the input will be validated.
@@ -73,7 +78,11 @@ export const resolveOpenapiAppRequest = async (
     );
   }
 
-  const operation = (openapi.paths as any)?.[match.path]?.[method] as
+  const pathItem = (openapi.paths as any)?.[
+    match.path
+  ] as OpenapiPathItemObject;
+
+  const operation = pathItem?.[method as keyof typeof pathItem] as
     | OpenapiOperationObject
     | undefined;
 
@@ -83,6 +92,42 @@ export const resolveOpenapiAppRequest = async (
       headers: defaultHeaders,
     });
   }
+
+  const parameters = pathItem.parameters || operation?.parameters;
+
+  const resolvedParameters = parameters
+    ? await Promise.all(
+        parameters.map((parameter) => {
+          return resolveReferenceOrContinue(parameter, openapi);
+        }),
+      )
+    : undefined;
+
+  const headers = resolvedParameters
+    ? mergeObjectsArray(
+        resolvedParameters
+          .filter((item) => item.in === "header")
+          .map((x) => ({ [x.name]: request.headers.get(x.name) })),
+      )
+    : undefined;
+
+  // ?a=b&c=d becomes {a:b,c:d} but only if it's in the parameter spec
+  const queryParams = resolvedParameters
+    ? mergeObjectsArray(
+        new URL(request.url).search
+          .slice(1)
+          .split("&")
+          .map((x) => x.split("=") as [string, string | undefined])
+          .filter((x) =>
+            resolvedParameters?.find(
+              (item) => item.in === "query" && item.name === x[0],
+            ),
+          )
+          .map((item) => {
+            return { [item[0]]: item[1] };
+          }),
+      )
+    : undefined;
 
   const schema = await tryGetOperationBodySchema(openapi, operation);
 
@@ -142,8 +187,10 @@ export const resolveOpenapiAppRequest = async (
     Object.keys(match.context).length > 0 &&
     typeof data === "object" &&
     data !== null
-      ? { ...data, ...match.context }
+      ? { ...data, ...match.context, ...queryParams, ...headers }
       : data;
+
+  console.log({ context });
 
   // valid! Let's execute.
   const resultJson = await fn(context);

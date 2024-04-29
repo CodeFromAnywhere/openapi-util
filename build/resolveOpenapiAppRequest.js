@@ -2,6 +2,7 @@ import { mergeObjectsArray } from "from-anywhere";
 import { makeOpenapiPathRouter } from "./makeOpenapiPathRouter.js";
 import { tryGetOperationBodySchema } from "./tryGetOperationBodySchema.js";
 import { tryValidateSchema } from "./tryValidateSchema.js";
+import { resolveReferenceOrContinue } from "./resolveReferenceOrContinue.js";
 /**
  * Function that turns a regular function into an endpoint. If the function is available in the OpenAPI (with function name equalling the operationId), the input will be validated.
  *
@@ -47,13 +48,36 @@ export const resolveOpenapiAppRequest = async (request, method, config) => {
             headers: defaultHeaders,
         });
     }
-    const operation = openapi.paths?.[match.path]?.[method];
+    const pathItem = openapi.paths?.[match.path];
+    const operation = pathItem?.[method];
     if (!operation) {
         return Response.json("Endpoint not found", {
             status: 404,
             headers: defaultHeaders,
         });
     }
+    const parameters = pathItem.parameters || operation?.parameters;
+    const resolvedParameters = parameters
+        ? await Promise.all(parameters.map((parameter) => {
+            return resolveReferenceOrContinue(parameter, openapi);
+        }))
+        : undefined;
+    const headers = resolvedParameters
+        ? mergeObjectsArray(resolvedParameters
+            .filter((item) => item.in === "header")
+            .map((x) => ({ [x.name]: request.headers.get(x.name) })))
+        : undefined;
+    // ?a=b&c=d becomes {a:b,c:d} but only if it's in the parameter spec
+    const queryParams = resolvedParameters
+        ? mergeObjectsArray(new URL(request.url).search
+            .slice(1)
+            .split("&")
+            .map((x) => x.split("="))
+            .filter((x) => resolvedParameters?.find((item) => item.in === "query" && item.name === x[0]))
+            .map((item) => {
+            return { [item[0]]: item[1] };
+        }))
+        : undefined;
     const schema = await tryGetOperationBodySchema(openapi, operation);
     if (!schema) {
         return Response.json("Schema not found", {
@@ -95,8 +119,9 @@ export const resolveOpenapiAppRequest = async (request, method, config) => {
     const context = Object.keys(match.context).length > 0 &&
         typeof data === "object" &&
         data !== null
-        ? { ...data, ...match.context }
+        ? { ...data, ...match.context, ...queryParams, ...headers }
         : data;
+    console.log({ context });
     // valid! Let's execute.
     const resultJson = await fn(context);
     return Response.json(resultJson, {
