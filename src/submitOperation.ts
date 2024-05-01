@@ -20,13 +20,13 @@ export const submitOperation = (context: {
   //openapiUrl: string;
   path: string;
   method: string;
-  servers: { url: string }[];
+  servers: { url: string | undefined }[];
   parameters?: OpenapiParameterObject[];
   /** The combined data from your form. Flat object. */
   data: O;
 }) => {
   const { data, method, path, servers, parameters } = context;
-  const firstServerUrl = servers[0].url;
+  const firstServerUrl = servers.find((x) => x.url)?.url;
 
   const queryParameters = parameters
     ? parameters.filter((x) => x.in === "query")

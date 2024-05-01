@@ -19,7 +19,7 @@ export declare const submitOperation: (context: {
     path: string;
     method: string;
     servers: {
-        url: string;
+        url: string | undefined;
     }[];
     parameters?: OpenapiParameterObject[];
     /** The combined data from your form. Flat object. */
