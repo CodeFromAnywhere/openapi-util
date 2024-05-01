@@ -60,7 +60,7 @@ export const getOperations = async (
             // TODO: Get it fully resolved from the openapi. Do some research to find this function
             const resolvedRequestBodySchema: OpenAPIV3.SchemaObject = schema;
 
-            const id = operation.operationId || path + "=" + method;
+            const id = operation.operationId || path.slice(1) + "=" + method;
             return {
               openapiId,
               path,

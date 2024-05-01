@@ -98,7 +98,7 @@ export const resolveOpenapiAppRequest = async (request, method, config) => {
             headers: defaultHeaders,
         });
     }
-    const operationId = operation.operationId || match.path + "=" + method;
+    const operationId = operation.operationId || match.path.slice(1) + "=" + method;
     const fn = functions[operationId];
     if (!fn) {
         return Response.json("Function not found", {

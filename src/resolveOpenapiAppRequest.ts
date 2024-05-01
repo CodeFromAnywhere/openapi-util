@@ -160,7 +160,8 @@ export const resolveOpenapiAppRequest = async (
     );
   }
 
-  const operationId = operation.operationId || match.path + "=" + method;
+  const operationId =
+    operation.operationId || match.path.slice(1) + "=" + method;
 
   const fn = functions[operationId];
 

@@ -28,7 +28,7 @@ export const getOperations = async (openapi, openapiId, documentLocation) => {
             const schema = await resolveReferenceOrContinue((await resolveReferenceOrContinue(operation.requestBody, openapi, documentLocation)).content["application/json"].schema, openapi, documentLocation);
             // TODO: Get it fully resolved from the openapi. Do some research to find this function
             const resolvedRequestBodySchema = schema;
-            const id = operation.operationId || path + "=" + method;
+            const id = operation.operationId || path.slice(1) + "=" + method;
             return {
                 openapiId,
                 path,
