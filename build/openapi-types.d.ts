@@ -16,5 +16,6 @@ export type OpenapiOperationObject = OpenAPIV3.OperationObject;
 export type OpenapiResponseObject = OpenAPIV3.ResponseObject;
 export type HttpMethods = OpenAPIV3.HttpMethods;
 export type ReferenceObject = OpenAPIV3.ReferenceObject;
+export type HttpMethodEnum = "get" | "put" | "post" | "delete" | "options" | "head" | "patch" | "trace";
 export {};
 //# sourceMappingURL=openapi-types.d.ts.map

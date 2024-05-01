@@ -8,6 +8,7 @@ import {
 import { tryGetOperationBodySchema } from "./tryGetOperationBodySchema.js";
 import { tryValidateSchema } from "./tryValidateSchema.js";
 import { resolveReferenceOrContinue } from "./resolveReferenceOrContinue.js";
+import { JSONSchemaType } from "ajv";
 
 /**
  * Function that turns a regular function into an endpoint. If the function is available in the OpenAPI (with function name equalling the operationId), the input will be validated.
@@ -136,7 +137,9 @@ export const resolveOpenapiAppRequest = async (
       ? (request.body as Json)
       : undefined;
 
-  const errors = schema ? tryValidateSchema({ schema, data }) : undefined;
+  const errors = schema
+    ? tryValidateSchema({ schema: schema as JSONSchemaType<any>, data })
+    : undefined;
   // validate this schema and return early if it fails
 
   if (errors && errors.length > 0) {
@@ -169,11 +172,15 @@ export const resolveOpenapiAppRequest = async (
   const pathParams =
     Object.keys(match.context).length > 0 ? match.context : undefined;
 
-  // TODO: figure out how to accept non-object parameters and also headers / query params, etc.
-  const context =
-    typeof data === "object" && data !== null
-      ? { ...data, ...pathParams, ...queryParams, ...headers }
-      : data;
+  // TODO: add proper typing for this if we ever accept non-object bodies in our openapi spec
+  const body =
+    typeof data === "object" && !Array.isArray(data) && data !== null
+      ? data
+      : data === undefined
+      ? undefined
+      : { body: data };
+
+  const context = { ...body, ...pathParams, ...queryParams, ...headers };
 
   console.log({ context });
 

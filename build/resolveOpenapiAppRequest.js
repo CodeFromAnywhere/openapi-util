@@ -82,7 +82,9 @@ export const resolveOpenapiAppRequest = async (request, method, config) => {
     const data = request.headers.get("content-type") === "application/json"
         ? request.body
         : undefined;
-    const errors = schema ? tryValidateSchema({ schema, data }) : undefined;
+    const errors = schema
+        ? tryValidateSchema({ schema: schema, data })
+        : undefined;
     // validate this schema and return early if it fails
     if (errors && errors.length > 0) {
         return Response.json({
@@ -104,10 +106,13 @@ export const resolveOpenapiAppRequest = async (request, method, config) => {
         });
     }
     const pathParams = Object.keys(match.context).length > 0 ? match.context : undefined;
-    // TODO: figure out how to accept non-object parameters and also headers / query params, etc.
-    const context = typeof data === "object" && data !== null
-        ? { ...data, ...pathParams, ...queryParams, ...headers }
-        : data;
+    // TODO: add proper typing for this if we ever accept non-object bodies in our openapi spec
+    const body = typeof data === "object" && !Array.isArray(data) && data !== null
+        ? data
+        : data === undefined
+            ? undefined
+            : { body: data };
+    const context = { ...body, ...pathParams, ...queryParams, ...headers };
     console.log({ context });
     // valid! Let's execute.
     const resultJson = await fn(context);

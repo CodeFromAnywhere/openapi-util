@@ -1,10 +1,10 @@
-import { JSONSchemaType } from "ajv";
 import { resolveReferenceOrContinue } from "./resolveReferenceOrContinue.js";
 import {
   OpenapiDocument,
   OpenapiOperationObject,
   ReferenceObject,
 } from "./openapi-types.js";
+import { JSONSchema7 } from "json-schema";
 
 export const tryGetOperationBodySchema = async (
   openapi: OpenapiDocument,
@@ -22,13 +22,13 @@ export const tryGetOperationBodySchema = async (
     );
 
     const schemaOrReference = requestBody?.content?.["application/json"]
-      ?.schema as JSONSchemaType<any> | ReferenceObject | undefined;
+      ?.schema as JSONSchema7 | ReferenceObject | undefined;
     const schema = await resolveReferenceOrContinue(
       schemaOrReference,
       openapi,
       documentLocation,
     );
-    return schema as JSONSchemaType<any>;
+    return schema as JSONSchema7;
   } catch (e) {
     console.log("tryGetOperationBodySchema", e);
     return;
