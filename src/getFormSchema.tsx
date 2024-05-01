@@ -5,7 +5,6 @@ import {
   OpenapiParameterObject,
 } from "./openapi-types.js";
 import { resolveSchemaRecursive } from "./resolveSchemaRecursive.js";
-import { tryGetOperationBodySchema } from "./tryGetOperationBodySchema.js";
 
 /** Resolves the body and all parameter schemas and merges them into a single schema
  *
