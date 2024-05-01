@@ -29,6 +29,7 @@ export const getFormSchema = async (context: {
 
   const pathItem = openapi.paths[path as keyof typeof openapi.paths];
   const operation = pathItem?.[method];
+
   if (!operation) {
     return { servers: [], schema: undefined };
   }
@@ -68,10 +69,6 @@ export const getFormSchema = async (context: {
     "application/json"
   ]?.schema as JSONSchema7 | undefined;
 
-  if (!bodySchema) {
-    return { servers: serversWithOrigin, schema: undefined };
-  }
-
   const parameterSchemas = (parameters || []).map(
     (item) =>
       ({
@@ -81,7 +78,9 @@ export const getFormSchema = async (context: {
       } as JSONSchema7),
   );
 
-  const allSchemas = parameterSchemas.concat(bodySchema);
+  const allSchemas = bodySchema
+    ? parameterSchemas.concat(bodySchema)
+    : parameterSchemas;
 
   const mergedSchema = allSchemas.reduce(
     (accumulator, next) => {

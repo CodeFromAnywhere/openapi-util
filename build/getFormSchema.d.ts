@@ -11,13 +11,7 @@ export declare const getFormSchema: (context: {
     path: string;
     method: HttpMethodEnum;
 }) => Promise<{
-    servers: {
-        url: string;
-        description?: string | undefined;
-        variables?: {
-            [variable: string]: import("openapi-types").OpenAPIV3.ServerVariableObject;
-        } | undefined;
-    }[];
+    servers: never[];
     schema: undefined;
     parameters?: undefined;
 } | {

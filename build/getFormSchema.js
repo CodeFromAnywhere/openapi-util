@@ -42,15 +42,14 @@ export const getFormSchema = async (context) => {
     });
     const parameters = (pathItem?.parameters || operation?.parameters);
     const bodySchema = operation.requestBody?.content?.["application/json"]?.schema;
-    if (!bodySchema) {
-        return { servers: serversWithOrigin, schema: undefined };
-    }
     const parameterSchemas = (parameters || []).map((item) => ({
         type: "object",
         required: item.required ? [item.name] : undefined,
         properties: { [item.name]: item.schema },
     }));
-    const allSchemas = parameterSchemas.concat(bodySchema);
+    const allSchemas = bodySchema
+        ? parameterSchemas.concat(bodySchema)
+        : parameterSchemas;
     const mergedSchema = allSchemas.reduce((accumulator, next) => {
         return {
             ...accumulator,
