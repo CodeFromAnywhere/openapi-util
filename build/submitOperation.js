@@ -6,7 +6,7 @@ import qs from "qs";
  * Returns an executed fetch-call */
 export const submitOperation = (context) => {
     const { data, method, path, servers, parameters } = context;
-    const firstServerUrl = servers.find((x) => x.url)?.url;
+    const firstServerUrl = servers?.find((x) => x.url)?.url;
     const queryParameters = parameters
         ? parameters.filter((x) => x.in === "query")
         : [];

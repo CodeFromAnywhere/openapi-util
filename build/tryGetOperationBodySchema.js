@@ -1,13 +1,13 @@
-import { resolveReferenceOrContinue } from "./resolveReferenceOrContinue.js";
+import { resolveReferenceBrowser } from "./resolveReferenceBrowser.js";
 export const tryGetOperationBodySchema = async (openapi, operation, documentLocation) => {
     if (!operation.requestBody) {
         return;
     }
     try {
-        const requestBody = await resolveReferenceOrContinue(operation.requestBody, openapi, documentLocation);
+        const requestBody = await resolveReferenceBrowser(operation.requestBody, openapi, documentLocation);
         const schemaOrReference = requestBody?.content?.["application/json"]
             ?.schema;
-        const schema = await resolveReferenceOrContinue(schemaOrReference, openapi, documentLocation);
+        const schema = await resolveReferenceBrowser(schemaOrReference, openapi, documentLocation);
         return schema;
     }
     catch (e) {

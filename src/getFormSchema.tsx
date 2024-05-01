@@ -25,13 +25,13 @@ export const getFormSchema = async (context: {
   })) as OpenapiDocument | undefined;
 
   if (!openapi) {
-    return { servers: undefined, schema: undefined };
+    return { servers: [], schema: undefined };
   }
 
   const pathItem = openapi.paths[path as keyof typeof openapi.paths];
   const operation = pathItem?.[method];
   if (!operation) {
-    return { servers: undefined, schema: undefined };
+    return { servers: [], schema: undefined };
   }
 
   //MERGE according to spec:
@@ -40,12 +40,23 @@ export const getFormSchema = async (context: {
     : pathItem.servers?.length
     ? pathItem.servers
     : openapi.servers;
-  const serversWithOrigin = servers?.map((server) => {
+
+  const originUrl = URL.canParse(openapiUri)
+    ? new URL(openapiUri).origin
+    : undefined;
+
+  const serversWithUrl = servers?.filter((x) => !!x.url);
+  const serversWithBaseServer =
+    serversWithUrl && serversWithUrl.length > 0
+      ? serversWithUrl
+      : originUrl
+      ? [{ url: originUrl }]
+      : [];
+
+  const serversWithOrigin = serversWithBaseServer.map((server) => {
     const fullUrl = URL.canParse(server.url)
       ? server.url
-      : URL.canParse(openapiUri)
-      ? new URL(openapiUri).origin + server.url
-      : undefined;
+      : (originUrl || "") + server.url;
 
     return { ...server, url: fullUrl };
   });
@@ -53,7 +64,9 @@ export const getFormSchema = async (context: {
   const parameters = (pathItem?.parameters ||
     operation?.parameters) as OpenapiParameterObject[];
 
-  const bodySchema = await tryGetOperationBodySchema(openapi, operation);
+  const bodySchema = (operation as any).requestBody?.content?.[
+    "application/json"
+  ]?.schema as JSONSchema7 | undefined;
 
   if (!bodySchema) {
     return { servers: serversWithOrigin, schema: undefined };

@@ -78,7 +78,8 @@ export const resolveOpenapiAppRequest = async (request, method, config) => {
             return { [item[0]]: item[1] };
         }))
         : undefined;
-    const schema = await tryGetOperationBodySchema(openapi, operation);
+    // TODO:FIX
+    const schema = await tryGetOperationBodySchema(openapi, operation, "");
     const data = request.headers.get("content-type") === "application/json"
         ? request.body
         : undefined;

@@ -12,23 +12,23 @@ export declare const getFormSchema: (context: {
     method: HttpMethodEnum;
 }) => Promise<{
     servers: {
-        url: string | undefined;
+        url: string;
         description?: string | undefined;
         variables?: {
             [variable: string]: import("openapi-types").OpenAPIV3.ServerVariableObject;
         } | undefined;
-    }[] | undefined;
+    }[];
     schema: undefined;
     parameters?: undefined;
 } | {
     schema: JSONSchema7;
     servers: {
-        url: string | undefined;
+        url: string;
         description?: string | undefined;
         variables?: {
             [variable: string]: import("openapi-types").OpenAPIV3.ServerVariableObject;
         } | undefined;
-    }[] | undefined;
+    }[];
     parameters: import("openapi-types").OpenAPIV3.ParameterObject[];
 }>;
 //# sourceMappingURL=getFormSchema.d.ts.map
