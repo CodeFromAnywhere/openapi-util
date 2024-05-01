@@ -1,5 +1,6 @@
 import { JSONSchema7 } from "json-schema";
 import { HttpMethodEnum } from "./openapi-types.js";
+import { OpenAPIV3 } from "openapi-types";
 /** Resolves the body and all parameter schemas and merges them into a single schema
  *
  * Also resolves the to-be-used servers for the operation according to spec: https://learn.openapis.org/specification/servers.html#the-server-object
@@ -14,15 +15,19 @@ export declare const getFormSchema: (context: {
     servers: never[];
     schema: undefined;
     parameters?: undefined;
+    securitySchemes?: undefined;
 } | {
     schema: JSONSchema7;
     servers: {
         url: string;
         description?: string | undefined;
         variables?: {
-            [variable: string]: import("openapi-types").OpenAPIV3.ServerVariableObject;
+            [variable: string]: OpenAPIV3.ServerVariableObject;
         } | undefined;
     }[];
-    parameters: import("openapi-types").OpenAPIV3.ParameterObject[] | undefined;
+    parameters: OpenAPIV3.ParameterObject[] | undefined;
+    securitySchemes: {
+        [key: string]: OpenAPIV3.SecuritySchemeObject;
+    } | undefined;
 }>;
 //# sourceMappingURL=getFormSchema.d.ts.map

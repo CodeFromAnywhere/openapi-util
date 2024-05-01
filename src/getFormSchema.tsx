@@ -5,6 +5,8 @@ import {
   OpenapiParameterObject,
 } from "./openapi-types.js";
 import { resolveSchemaRecursive } from "./resolveSchemaRecursive.js";
+import { OpenAPIV3 } from "openapi-types";
+import { notEmpty } from "from-anywhere";
 
 /** Resolves the body and all parameter schemas and merges them into a single schema
  *
@@ -33,6 +35,12 @@ export const getFormSchema = async (context: {
   if (!operation) {
     return { servers: [], schema: undefined };
   }
+
+  const securitySchemes = openapi.components?.securitySchemes as
+    | {
+        [key: string]: OpenAPIV3.SecuritySchemeObject;
+      }
+    | undefined;
 
   //MERGE according to spec:
   const servers = operation.servers?.length
@@ -75,12 +83,93 @@ export const getFormSchema = async (context: {
         type: "object",
         required: item.required ? [item.name] : undefined,
         properties: { [item.name]: item.schema as JSONSchema7 },
-      } as JSONSchema7),
+      } as JSONSchema7 | undefined),
   );
 
-  const allSchemas = bodySchema
-    ? parameterSchemas.concat(bodySchema)
-    : parameterSchemas;
+  const securitySchemas = securitySchemes
+    ? (Object.values(securitySchemes).map((item) => {
+        if (item.type === "apiKey") {
+          const schema: JSONSchema7 = {
+            type: "object",
+            properties: {
+              [item.name]: { type: "string" },
+            },
+          };
+          return schema;
+        }
+
+        if (item.type === "http") {
+          if (item.scheme === "basic") {
+            const schema: JSONSchema7 = {
+              type: "object",
+              properties: {
+                httpBasicUsername: { type: "string" },
+                httpBasicPassword: { type: "string" },
+              },
+            };
+            return schema;
+          }
+
+          if (item.scheme === "bearer") {
+            const schema: JSONSchema7 = {
+              type: "object",
+              properties: { httpBearerToken: { type: "string" } },
+            };
+            return schema;
+          }
+
+          const schema: JSONSchema7 = {
+            type: "object",
+            properties: {
+              httpAuth: {
+                type: "string",
+                description: `Unknown http auth: scheme=${item.scheme}`,
+              },
+            },
+          };
+          return schema;
+        }
+
+        if (item.type === "oauth2") {
+          const schema: JSONSchema7 = {
+            type: "object",
+            properties: {
+              oauth2: { type: "string", description: "Not implemented yet" },
+            },
+          };
+          return schema;
+        }
+
+        if (item.type === "openIdConnect") {
+          const schema: JSONSchema7 = {
+            type: "object",
+            properties: {
+              openIdConnect: {
+                type: "string",
+                description: "Not implemented yet",
+              },
+            },
+          };
+          return schema;
+        }
+
+        const schema: JSONSchema7 = {
+          type: "object",
+          properties: {
+            unknownSecurity: {
+              type: "string",
+              description: `Unknown security: ${(item as any)?.type}`,
+            },
+          },
+        };
+        return schema;
+      }) as (JSONSchema7 | undefined)[])
+    : [];
+
+  const allSchemas = securitySchemas
+    .concat(parameterSchemas)
+    .concat(bodySchema)
+    .filter(notEmpty);
 
   const mergedSchema = allSchemas.reduce(
     (accumulator, next) => {
@@ -97,7 +186,12 @@ export const getFormSchema = async (context: {
     } as JSONSchema7,
   );
 
-  return { schema: mergedSchema, servers: serversWithOrigin, parameters };
+  return {
+    schema: mergedSchema,
+    servers: serversWithOrigin,
+    parameters,
+    securitySchemes,
+  };
 };
 /* TEST:
 getFormSchema({
