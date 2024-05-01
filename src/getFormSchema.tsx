@@ -60,8 +60,9 @@ export const getFormSchema = async (context: {
     return { ...server, url: fullUrl };
   });
 
-  const parameters = (pathItem?.parameters ||
-    operation?.parameters) as OpenapiParameterObject[];
+  const parameters = (pathItem?.parameters || operation?.parameters) as
+    | OpenapiParameterObject[]
+    | undefined;
 
   const bodySchema = (operation as any).requestBody?.content?.[
     "application/json"
@@ -71,7 +72,7 @@ export const getFormSchema = async (context: {
     return { servers: serversWithOrigin, schema: undefined };
   }
 
-  const parameterSchemas = parameters.map(
+  const parameterSchemas = (parameters || []).map(
     (item) =>
       ({
         type: "object",

@@ -40,13 +40,12 @@ export const getFormSchema = async (context) => {
             : (originUrl || "") + server.url;
         return { ...server, url: fullUrl };
     });
-    const parameters = (pathItem?.parameters ||
-        operation?.parameters);
+    const parameters = (pathItem?.parameters || operation?.parameters);
     const bodySchema = operation.requestBody?.content?.["application/json"]?.schema;
     if (!bodySchema) {
         return { servers: serversWithOrigin, schema: undefined };
     }
-    const parameterSchemas = parameters.map((item) => ({
+    const parameterSchemas = (parameters || []).map((item) => ({
         type: "object",
         required: item.required ? [item.name] : undefined,
         properties: { [item.name]: item.schema },

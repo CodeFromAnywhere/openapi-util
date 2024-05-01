@@ -29,6 +29,6 @@ export declare const getFormSchema: (context: {
             [variable: string]: import("openapi-types").OpenAPIV3.ServerVariableObject;
         } | undefined;
     }[];
-    parameters: import("openapi-types").OpenAPIV3.ParameterObject[];
+    parameters: import("openapi-types").OpenAPIV3.ParameterObject[] | undefined;
 }>;
 //# sourceMappingURL=getFormSchema.d.ts.map
