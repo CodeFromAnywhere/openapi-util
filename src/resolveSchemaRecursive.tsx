@@ -55,6 +55,6 @@ resolveSchemaRecursive({ document: p }).then((res) => {
 });
 */
 
-resolveSchemaRecursive({
-  documentUri: "/Users/king/Desktop/github/opencrud/public/openapi.json",
-});
+// resolveSchemaRecursive({
+//   documentUri: "/Users/king/Desktop/github/opencrud/public/openapi.json",
+// });
