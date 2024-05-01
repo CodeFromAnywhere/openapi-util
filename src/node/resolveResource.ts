@@ -1,7 +1,7 @@
 import { JSONSchemaType } from "ajv";
 import { readJsonFile } from "from-anywhere/node";
 import path from "path";
-import { OpenapiDocument } from "./openapi-types.js";
+import { OpenapiDocument } from "../openapi-types.js";
 
 export const resolveResource = async (
   uri: string,

@@ -1,6 +1,6 @@
 import { JSONSchemaType } from "ajv";
 import { resolveResource } from "./resolveResource.js";
-import { OpenapiDocument, ReferenceObject } from "./openapi-types.js";
+import { OpenapiDocument, ReferenceObject } from "../openapi-types.js";
 
 /**
  * Function that resolves $ref, continues if it's not a ref, or throws an error

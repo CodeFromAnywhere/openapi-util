@@ -1,12 +1,12 @@
 import { Json, mergeObjectsArray } from "from-anywhere";
-import { makeOpenapiPathRouter } from "./makeOpenapiPathRouter.js";
+import { makeOpenapiPathRouter } from "../makeOpenapiPathRouter.js";
 import {
   OpenapiDocument,
   OpenapiOperationObject,
   OpenapiPathItemObject,
-} from "./openapi-types.js";
-import { tryGetOperationBodySchema } from "./tryGetOperationBodySchema.js";
-import { tryValidateSchema } from "./tryValidateSchema.js";
+} from "../openapi-types.js";
+import { tryGetOperationBodySchema } from "../tryGetOperationBodySchema.js";
+import { tryValidateSchema } from "../tryValidateSchema.js";
 import { resolveReferenceOrContinue } from "./resolveReferenceOrContinue.js";
 import { JSONSchemaType } from "ajv";
 
