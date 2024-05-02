@@ -1,11 +1,27 @@
-import { mergeObjectsArray, removeOptionalKeysFromObjectStrings, } from "from-anywhere";
+import { mergeObjectsArray, notEmpty, removeOptionalKeysFromObjectStrings, } from "from-anywhere";
 import qs from "qs";
 /**
  * Fills headers, path, query, cookies, and body into a fetch in the right way according to the spec.
  *
- * Returns an executed fetch-call */
+ * Returns an executed fetch-call
+ *
+ * NB: I'm not following the security spec perfectly yet, nor is any frontend validation happening. Let's do this at a later stage.
+ */
 export const submitOperation = (context) => {
-    const { data, method, path, servers, parameters } = context;
+    const { data, method, path, servers, parameters, securitySchemes } = context;
+    const securityArray = securitySchemes ? Object.values(securitySchemes) : [];
+    const basicHttp = securityArray.find((item) => item.type === "http" && item.scheme === "basic");
+    const basicBearer = securityArray.find((item) => item.type === "http" && item.scheme === "bearer");
+    const apiKeySecurity = securityArray.find((item) => item.type === "apiKey");
+    const authHeader = basicHttp
+        ? {
+            Authorization: `Basic ${btoa(`${data.httpBasicUsername}:${data.httpBasicPassword}`)}`,
+        }
+        : basicBearer
+            ? { Authorization: `Bearer ${data.httpBearerToken}` }
+            : apiKeySecurity && apiKeySecurity.in === "header"
+                ? { [apiKeySecurity.name]: data[apiKeySecurity.name] }
+                : undefined;
     const firstServerUrl = servers?.find((x) => x.url)?.url;
     const queryParameters = parameters
         ? parameters.filter((x) => x.in === "query")
@@ -25,7 +41,10 @@ export const submitOperation = (context) => {
     const headerParameters = parameters
         ? parameters.filter((x) => x.in === "header")
         : [];
-    const headers = mergeObjectsArray(headerParameters.map((item) => ({ [item.name]: data[item.name] })));
+    const allHeaders = [authHeader]
+        .concat(headerParameters.map((item) => ({ [item.name]: data[item.name] })))
+        .filter(notEmpty);
+    const headers = mergeObjectsArray(allHeaders);
     const bodyData = parameters
         ? removeOptionalKeysFromObjectStrings(data, parameters.map((x) => x.name))
         : data;
