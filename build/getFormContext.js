@@ -1,6 +1,7 @@
 import { resolveSchemaRecursive } from "./resolveSchemaRecursive.js";
 import { notEmpty } from "from-anywhere";
-/** Resolves the body and all parameter schemas and merges them into a single schema
+/**
+ * Resolves the body and all parameter schemas and merges them into a single schema
  *
  * Also resolves the to-be-used servers for the operation according to spec: https://learn.openapis.org/specification/servers.html#the-server-object
  *
