@@ -133,9 +133,9 @@ export const getFormContextFromOpenapi = (context) => {
             return schema;
         })
         : [];
-    const allSchemas = securitySchemas
+    const allSchemas = [bodySchema]
+        .concat(securitySchemas)
         .concat(parameterSchemas)
-        .concat(bodySchema)
         .filter(notEmpty);
     const mergedSchema = allSchemas.reduce((accumulator, next) => {
         return {

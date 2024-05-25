@@ -194,9 +194,9 @@ export const getFormContextFromOpenapi = (context: {
       }) as (JSONSchema7 | undefined)[])
     : [];
 
-  const allSchemas = securitySchemas
+  const allSchemas = [bodySchema]
+    .concat(securitySchemas)
     .concat(parameterSchemas)
-    .concat(bodySchema)
     .filter(notEmpty);
 
   const mergedSchema = allSchemas.reduce(
