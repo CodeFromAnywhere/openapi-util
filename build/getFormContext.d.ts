@@ -1,5 +1,5 @@
 import { JSONSchema7 } from "json-schema";
-import { HttpMethodEnum } from "./openapi-types.js";
+import { HttpMethodEnum, OpenapiDocument } from "./openapi-types.js";
 import { OpenAPIV3 } from "openapi-types";
 export type FormContext = {
     schema?: JSONSchema7;
@@ -9,8 +9,7 @@ export type FormContext = {
         [key: string]: OpenAPIV3.SecuritySchemeObject;
     } | undefined;
 };
-/**
- * Resolves the body and all parameter schemas and merges them into a single schema
+/** Resolves the body and all parameter schemas and merges them into a single schema
  *
  * Also resolves the to-be-used servers for the operation according to spec: https://learn.openapis.org/specification/servers.html#the-server-object
  *
@@ -21,4 +20,10 @@ export declare const getFormContext: (context: {
     path: string;
     method: HttpMethodEnum;
 }) => Promise<FormContext>;
+export declare const getFormContextFromOpenapi: (context: {
+    openapi?: OpenapiDocument;
+    path: string;
+    method: HttpMethodEnum;
+    originUrl?: string;
+}) => FormContext;
 //# sourceMappingURL=getFormContext.d.ts.map

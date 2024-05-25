@@ -18,8 +18,7 @@ export type FormContext = {
       }
     | undefined;
 };
-/**
- * Resolves the body and all parameter schemas and merges them into a single schema
+/** Resolves the body and all parameter schemas and merges them into a single schema
  *
  * Also resolves the to-be-used servers for the operation according to spec: https://learn.openapis.org/specification/servers.html#the-server-object
  *
@@ -31,10 +30,33 @@ export const getFormContext = async (context: {
   method: HttpMethodEnum;
 }): Promise<FormContext> => {
   const { method, openapiUri, path } = context;
+
+  const originUrl = URL.canParse(openapiUri)
+    ? new URL(openapiUri).origin
+    : undefined;
+
   const openapi = (await resolveSchemaRecursive({
     documentUri: openapiUri,
     shouldDereference: true,
   })) as OpenapiDocument | undefined;
+
+  return getFormContextFromOpenapi({ openapi, method, path, originUrl });
+};
+/* TEST:
+getFormSchema({
+  openapiUri: "/Users/king/Desktop/github/opencrud/public/openapi.json",
+  path: "/root/createDatabase",
+  method: "post",
+}).then(console.log);
+*/
+
+export const getFormContextFromOpenapi = (context: {
+  openapi?: OpenapiDocument;
+  path: string;
+  method: HttpMethodEnum;
+  originUrl?: string;
+}): FormContext => {
+  const { openapi, path, method, originUrl } = context;
 
   if (!openapi) {
     return { servers: [], schema: undefined };
@@ -46,7 +68,6 @@ export const getFormContext = async (context: {
   if (!operation) {
     return { servers: [], schema: undefined };
   }
-
   const securitySchemes = openapi.components?.securitySchemes as
     | {
         [key: string]: OpenAPIV3.SecuritySchemeObject;
@@ -59,10 +80,6 @@ export const getFormContext = async (context: {
     : pathItem.servers?.length
     ? pathItem.servers
     : openapi.servers;
-
-  const originUrl = URL.canParse(openapiUri)
-    ? new URL(openapiUri).origin
-    : undefined;
 
   const serversWithUrl = servers?.filter((x) => !!x.url);
   const serversWithBaseServer =
@@ -204,10 +221,3 @@ export const getFormContext = async (context: {
     securitySchemes,
   };
 };
-/* TEST:
-getFormSchema({
-  openapiUri: "/Users/king/Desktop/github/opencrud/public/openapi.json",
-  path: "/root/createDatabase",
-  method: "post",
-}).then(console.log);
-*/

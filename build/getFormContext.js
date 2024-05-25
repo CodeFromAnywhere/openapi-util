@@ -1,7 +1,6 @@
 import { resolveSchemaRecursive } from "./resolveSchemaRecursive.js";
 import { notEmpty } from "from-anywhere";
-/**
- * Resolves the body and all parameter schemas and merges them into a single schema
+/** Resolves the body and all parameter schemas and merges them into a single schema
  *
  * Also resolves the to-be-used servers for the operation according to spec: https://learn.openapis.org/specification/servers.html#the-server-object
  *
@@ -9,10 +8,24 @@ import { notEmpty } from "from-anywhere";
  */
 export const getFormContext = async (context) => {
     const { method, openapiUri, path } = context;
+    const originUrl = URL.canParse(openapiUri)
+        ? new URL(openapiUri).origin
+        : undefined;
     const openapi = (await resolveSchemaRecursive({
         documentUri: openapiUri,
         shouldDereference: true,
     }));
+    return getFormContextFromOpenapi({ openapi, method, path, originUrl });
+};
+/* TEST:
+getFormSchema({
+  openapiUri: "/Users/king/Desktop/github/opencrud/public/openapi.json",
+  path: "/root/createDatabase",
+  method: "post",
+}).then(console.log);
+*/
+export const getFormContextFromOpenapi = (context) => {
+    const { openapi, path, method, originUrl } = context;
     if (!openapi) {
         return { servers: [], schema: undefined };
     }
@@ -28,9 +41,6 @@ export const getFormContext = async (context) => {
         : pathItem.servers?.length
             ? pathItem.servers
             : openapi.servers;
-    const originUrl = URL.canParse(openapiUri)
-        ? new URL(openapiUri).origin
-        : undefined;
     const serversWithUrl = servers?.filter((x) => !!x.url);
     const serversWithBaseServer = serversWithUrl && serversWithUrl.length > 0
         ? serversWithUrl
@@ -145,11 +155,4 @@ export const getFormContext = async (context) => {
         securitySchemes,
     };
 };
-/* TEST:
-getFormSchema({
-  openapiUri: "/Users/king/Desktop/github/opencrud/public/openapi.json",
-  path: "/root/createDatabase",
-  method: "post",
-}).then(console.log);
-*/
 //# sourceMappingURL=getFormContext.js.map
