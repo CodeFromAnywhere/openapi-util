@@ -22,7 +22,7 @@ export const submitOperation = (context) => {
             : apiKeySecurity && apiKeySecurity.in === "header"
                 ? { [apiKeySecurity.name]: data[apiKeySecurity.name] }
                 : undefined;
-    const firstServerUrl = servers?.find((x) => x.url)?.url;
+    const firstServerUrl = servers?.find((x) => x.url)?.url || "";
     const queryParameters = parameters
         ? parameters.filter((x) => x.in === "query")
         : [];
@@ -50,6 +50,7 @@ export const submitOperation = (context) => {
         : data;
     const body = Object.keys(bodyData).length > 0 ? JSON.stringify(bodyData) : undefined;
     const url = firstServerUrl + realPath + queryPart;
+    console.log({ url, firstServerUrl, realPath, queryPart });
     const fetchRequestInit = { body, headers, method };
     return fetch(url, fetchRequestInit);
 };
