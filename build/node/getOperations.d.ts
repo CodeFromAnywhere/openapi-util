@@ -14,7 +14,7 @@ export declare const getOperations: (openapi: OpenAPIV3.Document, openapiId?: st
         description?: string | undefined;
         externalDocs?: OpenAPIV3.ExternalDocumentationObject | undefined;
         operationId?: string | undefined;
-        parameters?: (OpenAPIV3.ReferenceObject | OpenAPIV3.ParameterObject)[] | undefined;
+        parameters?: (OpenAPIV3.ParameterObject | OpenAPIV3.ReferenceObject)[] | undefined;
         requestBody?: OpenAPIV3.ReferenceObject | OpenAPIV3.RequestBodyObject | undefined;
         responses: OpenAPIV3.ResponsesObject;
         callbacks?: {
@@ -24,7 +24,7 @@ export declare const getOperations: (openapi: OpenAPIV3.Document, openapiId?: st
         security?: OpenAPIV3.SecurityRequirementObject[] | undefined;
         servers?: OpenAPIV3.ServerObject[] | undefined;
     };
-    parameters: (OpenAPIV3.ReferenceObject | OpenAPIV3.ParameterObject)[] | undefined;
+    parameters: (OpenAPIV3.ParameterObject | OpenAPIV3.ReferenceObject)[] | undefined;
     resolvedRequestBodySchema: OpenAPIV3.SchemaObject;
     id: string;
 }[]>;

@@ -17,5 +17,5 @@ export declare const resolveSchemaRecursive: (context: {
      *
      * (but it will not remove the original definitons or components/schemas). */
     shouldDereference?: boolean;
-}) => Promise<OpenapiDocument | JSONSchema7 | undefined>;
+}) => Promise<JSONSchema7 | OpenapiDocument | undefined>;
 //# sourceMappingURL=resolveSchemaRecursive.d.ts.map
