@@ -41,16 +41,18 @@ export const submitOperation = (context) => {
     const headerParameters = parameters
         ? parameters.filter((x) => x.in === "header")
         : [];
-    const allHeaders = [authHeader]
-        .concat(headerParameters.map((item) => ({ [item.name]: data[item.name] })))
-        .filter(notEmpty);
-    const headers = mergeObjectsArray(allHeaders);
     const bodyData = parameters
         ? removeOptionalKeysFromObjectStrings(data, parameters.map((x) => x.name))
         : data;
-    const body = Object.keys(bodyData).length > 0 ? JSON.stringify(bodyData) : undefined;
+    const hasBody = Object.keys(bodyData).length > 0;
+    const body = hasBody ? JSON.stringify(bodyData) : undefined;
+    const allHeaders = [authHeader]
+        .concat(headerParameters.map((item) => ({ [item.name]: data[item.name] })))
+        .concat(hasBody ? [{ "content-type": "application/json" }] : undefined)
+        .filter(notEmpty);
+    const headers = mergeObjectsArray(allHeaders);
+    console.log({ headers });
     const url = firstServerUrl + realPath + queryPart;
-    console.log({ url, firstServerUrl, realPath, queryPart });
     const fetchRequestInit = { body, headers, method };
     return fetch(url, fetchRequestInit);
 };

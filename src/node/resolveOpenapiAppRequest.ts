@@ -133,15 +133,30 @@ export const resolveOpenapiAppRequest = async (
   // TODO:FIX
 
   const schema = await tryGetOperationBodySchema(openapi, operation, "");
+  const isJsonContentType =
+    request.headers.get("content-type") === "application/json";
 
-  const data =
-    request.headers.get("content-type") === "application/json"
-      ? (request.body as Json)
-      : undefined;
+  if (schema && !isJsonContentType) {
+    return Response.json(
+      {
+        isSuccessful: false,
+        message: "Please add 'content-type: application/json' header",
+      },
+      {
+        status: 422,
+        headers: defaultHeaders,
+      },
+    );
+  }
+
+  const data = isJsonContentType ? (request.body as Json) : undefined;
+
+  console.log({ data });
 
   const errors = schema
     ? tryValidateSchema({ schema: schema as JSONSchemaType<any>, data })
     : undefined;
+
   // validate this schema and return early if it fails
 
   if (errors && errors.length > 0) {
@@ -151,7 +166,9 @@ export const resolveOpenapiAppRequest = async (
         isSuccessful: false,
         message:
           "Invalid Input\n\n" +
-          errors.map((x) => x.instancePath + ": " + x.message).join(" \n\n"),
+          errors
+            .map((x) => x.instancePath + x.schemaPath + ": " + x.message)
+            .join(" \n\n"),
         // errors,
       },
       {

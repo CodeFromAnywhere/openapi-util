@@ -80,9 +80,19 @@ export const resolveOpenapiAppRequest = async (request, method, config) => {
         : undefined;
     // TODO:FIX
     const schema = await tryGetOperationBodySchema(openapi, operation, "");
-    const data = request.headers.get("content-type") === "application/json"
-        ? request.body
-        : undefined;
+    console.log({ schema });
+    const isJsonContentType = request.headers.get("content-type") === "application/json";
+    if (schema && !isJsonContentType) {
+        return Response.json({
+            isSuccessful: false,
+            message: "Please add 'content-type: application/json' header",
+        }, {
+            status: 422,
+            headers: defaultHeaders,
+        });
+    }
+    const data = isJsonContentType ? request.body : undefined;
+    console.log({ data });
     const errors = schema
         ? tryValidateSchema({ schema: schema, data })
         : undefined;
@@ -92,7 +102,9 @@ export const resolveOpenapiAppRequest = async (request, method, config) => {
         return Response.json({
             isSuccessful: false,
             message: "Invalid Input\n\n" +
-                errors.map((x) => x.instancePath + ": " + x.message).join(" \n\n"),
+                errors
+                    .map((x) => x.instancePath + x.schemaPath + ": " + x.message)
+                    .join(" \n\n"),
             // errors,
         }, {
             status: 422,
