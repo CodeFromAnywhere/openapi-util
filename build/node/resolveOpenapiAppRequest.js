@@ -1,4 +1,4 @@
-import { mergeObjectsArray } from "from-anywhere";
+import { mergeObjectsArray, notEmpty } from "from-anywhere";
 import { makeOpenapiPathRouter } from "../makeOpenapiPathRouter.js";
 import { tryGetOperationBodySchema } from "../tryGetOperationBodySchema.js";
 import { tryValidateSchema } from "../tryValidateSchema.js";
@@ -65,7 +65,16 @@ export const resolveOpenapiAppRequest = async (request, method, config) => {
     const headers = resolvedParameters
         ? mergeObjectsArray(resolvedParameters
             .filter((item) => item.in === "header")
-            .map((x) => ({ [x.name]: request.headers.get(x.name) })))
+            .map((x) => {
+            const value = request.headers.get(x.name);
+            console.log({ value });
+            if (value === null) {
+                // this could be a problem if it were required
+                return;
+            }
+            return { [x.name]: value };
+        })
+            .filter(notEmpty))
         : undefined;
     // ?a=b&c=d becomes {a:b,c:d} but only if it's in the parameter spec
     const queryParams = resolvedParameters
@@ -78,7 +87,6 @@ export const resolveOpenapiAppRequest = async (request, method, config) => {
             return { [item[0]]: item[1] };
         }))
         : undefined;
-    // TODO:FIX
     const schema = await tryGetOperationBodySchema(openapi, operation, "");
     const isJsonContentType = request.headers.get("content-type") === "application/json";
     if (schema && !isJsonContentType) {
@@ -91,7 +99,7 @@ export const resolveOpenapiAppRequest = async (request, method, config) => {
         });
     }
     const data = isJsonContentType ? await request.json() : request.body;
-    console.log({ data });
+    console.log({ data, headers });
     const errors = schema
         ? tryValidateSchema({ schema: schema, data })
         : undefined;

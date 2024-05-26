@@ -100,14 +100,21 @@ export const submitOperation = (context: {
   const body = hasBody ? JSON.stringify(bodyData) : undefined;
 
   const allHeaders = [authHeader as { [key: string]: string } | undefined]
-    .concat(headerParameters.map((item) => ({ [item.name]: data[item.name] })))
+    .concat(
+      headerParameters.map((item) => {
+        const isPresent = !!data[item.name];
+        if (!isPresent) {
+          return;
+        }
+        return { [item.name]: data[item.name] };
+      }),
+    )
     .concat(hasBody ? [{ "Content-Type": "application/json" }] : undefined)
     .filter(notEmpty);
 
   const headers = mergeObjectsArray(allHeaders);
 
-  console.log("YOYO", { headers, body });
-
+  console.log("YIHI", { headerParameters, headers });
   const url = firstServerUrl + realPath + queryPart;
   const fetchRequestInit = { body, headers, method };
   return fetch(url, fetchRequestInit);

@@ -1,4 +1,4 @@
-import { Json, mergeObjectsArray } from "from-anywhere";
+import { Json, mergeObjectsArray, notEmpty } from "from-anywhere";
 import { makeOpenapiPathRouter } from "../makeOpenapiPathRouter.js";
 import {
   OpenapiDocument,
@@ -108,7 +108,16 @@ export const resolveOpenapiAppRequest = async (
     ? mergeObjectsArray(
         resolvedParameters
           .filter((item) => item.in === "header")
-          .map((x) => ({ [x.name]: request.headers.get(x.name) })),
+          .map((x) => {
+            const value = request.headers.get(x.name);
+            console.log({ value });
+            if (value === null) {
+              // this could be a problem if it were required
+              return;
+            }
+            return { [x.name]: value };
+          })
+          .filter(notEmpty),
       )
     : undefined;
 
@@ -130,8 +139,6 @@ export const resolveOpenapiAppRequest = async (
       )
     : undefined;
 
-  // TODO:FIX
-
   const schema = await tryGetOperationBodySchema(openapi, operation, "");
   const isJsonContentType =
     request.headers.get("content-type") === "application/json";
@@ -151,7 +158,7 @@ export const resolveOpenapiAppRequest = async (
 
   const data = isJsonContentType ? await request.json() : request.body;
 
-  console.log({ data });
+  console.log({ data, headers });
 
   const errors = schema
     ? tryValidateSchema({ schema: schema as JSONSchemaType<any>, data })
