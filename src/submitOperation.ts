@@ -114,7 +114,7 @@ export const submitOperation = (context: {
 
   const headers = mergeObjectsArray(allHeaders);
 
-  console.log("YIHI", { headerParameters, headers });
+  console.log("YIHI", { hasBody, headerParameters, headers });
   const url = firstServerUrl + realPath + queryPart;
   const fetchRequestInit = { body, headers, method };
   return fetch(url, fetchRequestInit);
