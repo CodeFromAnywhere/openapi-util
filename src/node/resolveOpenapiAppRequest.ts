@@ -145,6 +145,7 @@ export const resolveOpenapiAppRequest = async (
   // validate this schema and return early if it fails
 
   if (errors && errors.length > 0) {
+    console.log({ errors });
     return Response.json(
       {
         isSuccessful: false,

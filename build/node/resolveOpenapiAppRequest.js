@@ -88,6 +88,7 @@ export const resolveOpenapiAppRequest = async (request, method, config) => {
         : undefined;
     // validate this schema and return early if it fails
     if (errors && errors.length > 0) {
+        console.log({ errors });
         return Response.json({
             isSuccessful: false,
             message: "Invalid Input\n\n" +
