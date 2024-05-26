@@ -48,10 +48,10 @@ export const submitOperation = (context) => {
     const body = hasBody ? JSON.stringify(bodyData) : undefined;
     const allHeaders = [authHeader]
         .concat(headerParameters.map((item) => ({ [item.name]: data[item.name] })))
-        .concat(hasBody ? [{ "content-type": "application/json" }] : undefined)
+        .concat(hasBody ? [{ "Content-Type": "application/json" }] : undefined)
         .filter(notEmpty);
     const headers = mergeObjectsArray(allHeaders);
-    console.log("YOYO", { headers });
+    console.log("YOYO", { headers, body });
     const url = firstServerUrl + realPath + queryPart;
     const fetchRequestInit = { body, headers, method };
     return fetch(url, fetchRequestInit);

@@ -84,13 +84,13 @@ export const resolveOpenapiAppRequest = async (request, method, config) => {
     if (schema && !isJsonContentType) {
         return Response.json({
             isSuccessful: false,
-            message: "Please add 'content-type: application/json' header",
+            message: "Please add 'Content-Type: application/json' header",
         }, {
             status: 422,
             headers: defaultHeaders,
         });
     }
-    const data = isJsonContentType ? request.body : undefined;
+    const data = isJsonContentType ? await request.json() : request.body;
     console.log({ data });
     const errors = schema
         ? tryValidateSchema({ schema: schema, data })

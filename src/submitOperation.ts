@@ -101,12 +101,12 @@ export const submitOperation = (context: {
 
   const allHeaders = [authHeader as { [key: string]: string } | undefined]
     .concat(headerParameters.map((item) => ({ [item.name]: data[item.name] })))
-    .concat(hasBody ? [{ "content-type": "application/json" }] : undefined)
+    .concat(hasBody ? [{ "Content-Type": "application/json" }] : undefined)
     .filter(notEmpty);
 
   const headers = mergeObjectsArray(allHeaders);
 
-  console.log("YOYO", { headers });
+  console.log("YOYO", { headers, body });
 
   const url = firstServerUrl + realPath + queryPart;
   const fetchRequestInit = { body, headers, method };

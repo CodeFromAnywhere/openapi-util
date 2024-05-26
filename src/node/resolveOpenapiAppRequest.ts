@@ -140,7 +140,7 @@ export const resolveOpenapiAppRequest = async (
     return Response.json(
       {
         isSuccessful: false,
-        message: "Please add 'content-type: application/json' header",
+        message: "Please add 'Content-Type: application/json' header",
       },
       {
         status: 422,
@@ -149,7 +149,7 @@ export const resolveOpenapiAppRequest = async (
     );
   }
 
-  const data = isJsonContentType ? (request.body as Json) : undefined;
+  const data = isJsonContentType ? await request.json() : request.body;
 
   console.log({ data });
 
