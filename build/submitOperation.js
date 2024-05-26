@@ -51,7 +51,7 @@ export const submitOperation = (context) => {
         .concat(hasBody ? [{ "content-type": "application/json" }] : undefined)
         .filter(notEmpty);
     const headers = mergeObjectsArray(allHeaders);
-    console.log({ headers });
+    console.log("YOYO", { headers });
     const url = firstServerUrl + realPath + queryPart;
     const fetchRequestInit = { body, headers, method };
     return fetch(url, fetchRequestInit);

@@ -80,7 +80,6 @@ export const resolveOpenapiAppRequest = async (request, method, config) => {
         : undefined;
     // TODO:FIX
     const schema = await tryGetOperationBodySchema(openapi, operation, "");
-    console.log({ schema });
     const isJsonContentType = request.headers.get("content-type") === "application/json";
     if (schema && !isJsonContentType) {
         return Response.json({
