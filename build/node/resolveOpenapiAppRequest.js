@@ -15,6 +15,10 @@ export const resolveOpenapiAppRequest = async (request, method, config) => {
         "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
         // "Access-Control-Allow-Headers": "Content-Type, Authorization",
     };
+    if (method === "options") {
+        // preflight stuff
+        return Response.json({ ok: true }, { status: 200, headers: defaultHeaders });
+    }
     const url = request.url;
     const urlObject = new URL(url);
     const requestPathname = urlObject.pathname;
