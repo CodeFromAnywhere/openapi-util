@@ -17,7 +17,13 @@ export const resolveOpenapiAppRequest = async (request, method, config) => {
     };
     if (method === "options") {
         // preflight stuff
-        return Response.json({ ok: true }, { status: 200, headers: defaultHeaders });
+        return Response.json({ ok: true }, {
+            status: 200,
+            headers: {
+                ...defaultHeaders,
+                "Access-Control-Allow-Headers": "Content-Type, Authorization",
+            },
+        });
     }
     const url = request.url;
     const urlObject = new URL(url);

@@ -31,12 +31,17 @@ export const resolveOpenapiAppRequest = async (
     "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
     // "Access-Control-Allow-Headers": "Content-Type, Authorization",
   };
-
   if (method === "options") {
     // preflight stuff
     return Response.json(
       { ok: true },
-      { status: 200, headers: defaultHeaders },
+      {
+        status: 200,
+        headers: {
+          ...defaultHeaders,
+          "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        },
+      },
     );
   }
 
