@@ -21,7 +21,7 @@ export type OperationPartial = {
  *
  * NB: I'm not following the security spec perfectly yet, nor is any frontend validation happening. Let's do this at a later stage.
  */
-export const submitOperation = (context: {
+export const getOperationRequestInit = (context: {
   //openapiUrl: string;
   path: string;
   method: string;
@@ -98,7 +98,7 @@ export const submitOperation = (context: {
     : data;
   const hasBody = Object.keys(bodyData).length > 0;
   const body = hasBody ? JSON.stringify(bodyData) : undefined;
-
+  const realBodyData = hasBody ? bodyData : undefined;
   const allHeaders = [authHeader as { [key: string]: string } | undefined]
     .concat(
       headerParameters.map((item) => {
@@ -117,5 +117,5 @@ export const submitOperation = (context: {
   console.log("YIHI", { hasBody, headerParameters, headers });
   const url = firstServerUrl + realPath + queryPart;
   const fetchRequestInit = { body, headers, method };
-  return fetch(url, fetchRequestInit);
+  return { url, fetchRequestInit, bodyData: realBodyData };
 };
