@@ -5,4 +5,5 @@ import { makeOpenapiPathRouter } from "./makeOpenapiPathRouter";
 // https://stackoverflow.com/questions/695438/what-are-the-safe-characters-for-making-urls
 const router = makeOpenapiPathRouter(openapi);
 console.log(router("/ai_grunneger.123_456~789/openapi.json"));
+console.log(router("_next/static/chunks/main-app.js"));
 //# sourceMappingURL=makeOpenapiPathRouter.test.js.map

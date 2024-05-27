@@ -77,7 +77,6 @@ export const makeOpenapiPathRouter = (openapi) => {
         })));
         return { path: match.path, context };
     };
-    console.log({ regexes });
     return matcher;
 };
 //# sourceMappingURL=makeOpenapiPathRouter.js.map

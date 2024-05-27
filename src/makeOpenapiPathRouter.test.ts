@@ -8,3 +8,5 @@ import { OpenapiDocument } from "./openapi-types";
 const router = makeOpenapiPathRouter(openapi as OpenapiDocument);
 
 console.log(router("/ai_grunneger.123_456~789/openapi.json"));
+
+console.log(router("_next/static/chunks/main-app.js"));

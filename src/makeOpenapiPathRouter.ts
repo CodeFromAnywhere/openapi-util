@@ -99,6 +99,5 @@ export const makeOpenapiPathRouter = (openapi: OpenapiDocument) => {
     );
     return { path: match.path, context };
   };
-  console.log({ regexes });
   return matcher;
 };
