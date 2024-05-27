@@ -15,7 +15,9 @@ function pathToRegex(pathTemplate) {
     // Escape all RegExp special characters except for the placeholders
     let escapedPath = pathTemplate.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
     // Replace placeholders with a regex pattern to match any alphanumeric characters (and underscores)
-    let regexPattern = escapedPath.replace(/\\\{[^}]+\\\}/g, "(\\w+)");
+    let regexPattern = escapedPath.replace(/\\\{[^}]+\\\}/g, 
+    // this matches all non-reserved URL characters
+    "([a-zA-Z0-9._~-]+)");
     const fullRegexPattern = `^${regexPattern}$`;
     // Create a new RegExp object with start and end anchors
     return fullRegexPattern;
@@ -75,6 +77,7 @@ export const makeOpenapiPathRouter = (openapi) => {
         })));
         return { path: match.path, context };
     };
+    console.log({ regexes });
     return matcher;
 };
 //# sourceMappingURL=makeOpenapiPathRouter.js.map
