@@ -3,6 +3,15 @@ import { makeOpenapiPathRouter } from "../makeOpenapiPathRouter.js";
 import { tryGetOperationBodySchema } from "../tryGetOperationBodySchema.js";
 import { tryValidateSchema } from "../tryValidateSchema.js";
 import { resolveReferenceOrContinue } from "./resolveReferenceOrContinue.js";
+export const tryParseData = async (request, isJsonContentType) => {
+    try {
+        return isJsonContentType ? await request.json() : request.body;
+    }
+    catch (e) {
+        console.log("Couldn't parse JSON:", request.url);
+        return;
+    }
+};
 /**
  * Function that turns a regular function into an endpoint. If the function is available in the OpenAPI (with function name equalling the operationId), the input will be validated.
  *
@@ -108,8 +117,8 @@ export const resolveOpenapiAppRequest = async (request, method, config) => {
             headers: defaultHeaders,
         });
     }
-    const data = isJsonContentType ? await request.json() : request.body;
-    console.log({ data, headers });
+    const data = await tryParseData(request, isJsonContentType);
+    // console.log({ data, headers });
     const errors = schema
         ? tryValidateSchema({ schema: schema, data })
         : undefined;

@@ -1,4 +1,5 @@
 import { OpenapiDocument } from "../openapi-types.js";
+export declare const tryParseData: (request: Request, isJsonContentType: boolean) => Promise<any>;
 /**
  * Function that turns a regular function into an endpoint. If the function is available in the OpenAPI (with function name equalling the operationId), the input will be validated.
  *

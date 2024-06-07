@@ -10,6 +10,17 @@ import { tryValidateSchema } from "../tryValidateSchema.js";
 import { resolveReferenceOrContinue } from "./resolveReferenceOrContinue.js";
 import { JSONSchemaType } from "ajv";
 
+export const tryParseData = async (
+  request: Request,
+  isJsonContentType: boolean,
+) => {
+  try {
+    return isJsonContentType ? await request.json() : request.body;
+  } catch (e) {
+    console.log("Couldn't parse JSON:", request.url);
+    return;
+  }
+};
 /**
  * Function that turns a regular function into an endpoint. If the function is available in the OpenAPI (with function name equalling the operationId), the input will be validated.
  *
@@ -169,9 +180,9 @@ export const resolveOpenapiAppRequest = async (
     );
   }
 
-  const data = isJsonContentType ? await request.json() : request.body;
+  const data = await tryParseData(request, isJsonContentType);
 
-  console.log({ data, headers });
+  // console.log({ data, headers });
 
   const errors = schema
     ? tryValidateSchema({ schema: schema as JSONSchemaType<any>, data })
