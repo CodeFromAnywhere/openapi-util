@@ -29,7 +29,7 @@ documentLocation = process.cwd()) => {
     const chunks = pointer.split("/").slice(1);
     const resource = await resolveResource(uri, document, documentLocation);
     // 2) With resource, access the location
-    const blob = chunks.reduce((previous, current) => previous[current], resource);
+    const blob = chunks.reduce((previous, current) => previous?.[current], resource);
     return blob;
 };
 //# sourceMappingURL=resolveReferenceOrContinue.js.map

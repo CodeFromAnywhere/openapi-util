@@ -41,7 +41,7 @@ export const resolveReferenceOrContinue = async <T extends unknown>(
 
   // 2) With resource, access the location
   const blob = chunks.reduce(
-    (previous, current) => previous[current as keyof typeof previous],
+    (previous, current) => previous?.[current as keyof typeof previous],
     resource,
   ) as T;
 

@@ -7,8 +7,13 @@ export const resolveResource = async (uri, document, documentLocation) => {
     }
     if (uri.startsWith("https://") || uri.startsWith("http://")) {
         // absolute url
-        const json = await fetch(uri).then((res) => res.json());
-        return json;
+        try {
+            const json = await fetch(uri).then((res) => res.json());
+            return json;
+        }
+        catch (e) {
+            return;
+        }
     }
     if (uri.startsWith("/")) {
         // absolute path

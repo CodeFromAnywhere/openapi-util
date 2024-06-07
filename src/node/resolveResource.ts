@@ -7,7 +7,7 @@ export const resolveResource = async (
   uri: string,
   document: OpenapiDocument | JSONSchemaType<any>,
   documentLocation: string,
-): Promise<OpenapiDocument | JSONSchemaType<any>> => {
+): Promise<OpenapiDocument | JSONSchemaType<any> | undefined> => {
   if (uri === "") {
     // we're already there
     return document;
@@ -15,10 +15,14 @@ export const resolveResource = async (
 
   if (uri.startsWith("https://") || uri.startsWith("http://")) {
     // absolute url
-    const json = await fetch(uri).then(
-      (res) => res.json() as Promise<OpenapiDocument | JSONSchemaType<any>>,
-    );
-    return json;
+    try {
+      const json = await fetch(uri).then(
+        (res) => res.json() as Promise<OpenapiDocument | JSONSchemaType<any>>,
+      );
+      return json;
+    } catch (e) {
+      return;
+    }
   }
 
   if (uri.startsWith("/")) {
