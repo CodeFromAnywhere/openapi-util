@@ -1,7 +1,6 @@
 import { notEmpty } from "from-anywhere";
 import { OpenAPIV3 } from "openapi-types";
 import { resolveReferenceOrContinue } from "./resolveReferenceOrContinue.js";
-import { HttpMethodEnum } from "../openapi-types.js";
 
 /**
  * Responds with the operations from an openapi document by looking in the paths and (next)-allowed methods
@@ -65,7 +64,7 @@ export const getOperations = async (
             return {
               openapiId,
               path,
-              method: method as HttpMethodEnum,
+              method: method,
               operation,
               parameters,
               resolvedRequestBodySchema,
