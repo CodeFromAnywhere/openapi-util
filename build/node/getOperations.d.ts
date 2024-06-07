@@ -1,4 +1,5 @@
 import { OpenAPIV3 } from "openapi-types";
+import { HttpMethodEnum } from "../openapi-types.js";
 /**
  * Responds with the operations from an openapi document by looking in the paths and (next)-allowed methods
  *
@@ -7,7 +8,7 @@ import { OpenAPIV3 } from "openapi-types";
 export declare const getOperations: (openapi: OpenAPIV3.Document, openapiId?: string, documentLocation?: string) => Promise<{
     openapiId: string | undefined;
     path: string;
-    method: string;
+    method: HttpMethodEnum;
     operation: {
         tags?: string[] | undefined;
         summary?: string | undefined;

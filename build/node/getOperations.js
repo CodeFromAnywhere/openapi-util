@@ -32,7 +32,7 @@ export const getOperations = async (openapi, openapiId, documentLocation) => {
             return {
                 openapiId,
                 path,
-                method,
+                method: method,
                 operation,
                 parameters,
                 resolvedRequestBodySchema,
