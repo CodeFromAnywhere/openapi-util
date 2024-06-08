@@ -1,6 +1,3 @@
-import { JSONSchemaType } from "ajv";
-import { readJsonFile } from "from-anywhere/node";
-import path from "path";
 import { OpenapiDocument } from "./openapi-types.js";
 import { pathJoin } from "from-anywhere";
 import { JSONSchema7 } from "json-schema";
