@@ -27,9 +27,15 @@ documentLocation = process.cwd()) => {
     const [uri, pointer] = reference.split("#");
     // NB: the first one is an empty string
     const chunks = pointer.split("/").slice(1);
-    const resource = await resolveResource(uri, document, documentLocation);
-    // 2) With resource, access the location
-    const blob = chunks.reduce((previous, current) => previous?.[current], resource);
-    return blob;
+    try {
+        const resource = await resolveResource(uri, document, documentLocation);
+        // 2) With resource, access the location
+        const blob = chunks.reduce((previous, current) => previous?.[current], resource);
+        return blob;
+    }
+    catch (e) {
+        console.log(e?.message);
+        return;
+    }
 };
 //# sourceMappingURL=resolveReferenceOrContinue.js.map

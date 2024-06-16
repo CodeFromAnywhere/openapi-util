@@ -37,13 +37,19 @@ export const resolveReferenceOrContinue = async <T extends unknown>(
   const [uri, pointer] = reference.split("#");
   // NB: the first one is an empty string
   const chunks = pointer.split("/").slice(1);
-  const resource = await resolveResource(uri, document, documentLocation);
 
-  // 2) With resource, access the location
-  const blob = chunks.reduce(
-    (previous, current) => previous?.[current as keyof typeof previous],
-    resource,
-  ) as T;
+  try {
+    const resource = await resolveResource(uri, document, documentLocation);
 
-  return blob;
+    // 2) With resource, access the location
+    const blob = chunks.reduce(
+      (previous, current) => previous?.[current as keyof typeof previous],
+      resource,
+    ) as T;
+
+    return blob;
+  } catch (e: any) {
+    console.log(e?.message);
+    return;
+  }
 };
