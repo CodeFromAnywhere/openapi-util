@@ -122,10 +122,16 @@ export const resolveOpenapiAppRequest = async (
 
   console.log({ parameters });
 
+  const documentLocation = undefined;
+
   const resolvedParameters = parameters
     ? await Promise.all(
         parameters.map((parameter) => {
-          return resolveReferenceOrContinue(parameter, openapi);
+          return resolveReferenceOrContinue(
+            parameter,
+            openapi,
+            documentLocation,
+          );
         }),
       )
     : undefined;
@@ -240,6 +246,10 @@ export const resolveOpenapiAppRequest = async (
 
   // valid! Let's execute.
   const resultJson = await fn(context);
+
+  if (typeof resultJson === undefined) {
+    return new Response("No response", { status: 404 });
+  }
 
   return Response.json(resultJson, {
     status: 200,
