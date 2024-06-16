@@ -12,7 +12,7 @@ export const resolveReferenceOrContinue = async (maybeReference, document,
 /** URI (either path or url). Defaults to pwd */
 documentLocation = process.cwd()) => {
     if (maybeReference === undefined) {
-        throw new Error("Value isn't defined");
+        return;
     }
     const hasReference = typeof maybeReference === "object" &&
         maybeReference !== null &&

@@ -9,5 +9,5 @@ import { OpenapiDocument, ReferenceObject } from "../openapi-types.js";
  * - relative file locations
  * - url locations
  */
-export declare const resolveReferenceOrContinue: <T extends unknown>(maybeReference: import("openapi-types").OpenAPIV3.ReferenceObject | T | undefined, document: OpenapiDocument | JSONSchemaType<any>, documentLocation?: string) => Promise<T>;
+export declare const resolveReferenceOrContinue: <T extends unknown>(maybeReference: import("openapi-types").OpenAPIV3.ReferenceObject | T | undefined, document: OpenapiDocument | JSONSchemaType<any>, documentLocation?: string) => Promise<T | undefined>;
 //# sourceMappingURL=resolveReferenceOrContinue.d.ts.map

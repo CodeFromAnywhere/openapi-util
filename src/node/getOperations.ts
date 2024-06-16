@@ -1,6 +1,7 @@
 import { notEmpty } from "from-anywhere";
 import { OpenAPIV3 } from "openapi-types";
-import { resolveReferenceOrContinue } from "./resolveReferenceOrContinue.js";
+import { resolveSchemaRecursive } from "../resolveSchemaRecursive.js";
+import { OpenapiDocument } from "../openapi-types.js";
 
 /**
  * Responds with the operations from an openapi document by looking in the paths and (next)-allowed methods
@@ -12,6 +13,15 @@ export const getOperations = async (
   openapiId?: string,
   documentLocation?: string,
 ) => {
+  const resolved = (await resolveSchemaRecursive({
+    documentUri: documentLocation,
+    document: openapi,
+    shouldDereference: true,
+  })) as OpenapiDocument | undefined;
+
+  if (!resolved) {
+    return;
+  }
   const allowedMethods = [
     "get",
     "post",
@@ -24,9 +34,9 @@ export const getOperations = async (
 
   const operations = (
     await Promise.all(
-      Object.keys(openapi.paths).map(async (path) => {
+      Object.keys(resolved.paths).map(async (path) => {
         const item: OpenAPIV3.PathItemObject | undefined =
-          openapi.paths![path as keyof typeof openapi.paths];
+          resolved.paths![path as keyof typeof resolved.paths];
 
         if (!item) {
           return;
@@ -42,23 +52,13 @@ export const getOperations = async (
               method as keyof typeof item
             ] as OpenAPIV3.OperationObject;
 
-            // TODO: Get them resolved
             const parameters = operation.parameters || item.parameters;
 
-            const schema = await resolveReferenceOrContinue(
-              (
-                await resolveReferenceOrContinue(
-                  operation.requestBody,
-                  openapi,
-                  documentLocation,
-                )
-              ).content["application/json"].schema,
-              openapi,
-              documentLocation,
-            );
-
-            // TODO: Get it fully resolved from the openapi. Do some research to find this function
-            const resolvedRequestBodySchema: OpenAPIV3.SchemaObject = schema;
+            const resolvedRequestBodySchema = (
+              operation.requestBody as OpenAPIV3.RequestBodyObject
+            )?.content?.["application/json"].schema as
+              | OpenAPIV3.SchemaObject
+              | undefined;
 
             const id = operation.operationId || path.slice(1) + "=" + method;
             return {

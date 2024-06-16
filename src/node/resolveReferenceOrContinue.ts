@@ -16,9 +16,9 @@ export const resolveReferenceOrContinue = async <T extends unknown>(
   document: OpenapiDocument | JSONSchemaType<any>,
   /** URI (either path or url). Defaults to pwd */
   documentLocation: string = process.cwd(),
-): Promise<T> => {
+): Promise<T | undefined> => {
   if (maybeReference === undefined) {
-    throw new Error("Value isn't defined");
+    return;
   }
 
   const hasReference =

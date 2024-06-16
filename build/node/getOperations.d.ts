@@ -25,7 +25,7 @@ export declare const getOperations: (openapi: OpenAPIV3.Document, openapiId?: st
         servers?: OpenAPIV3.ServerObject[] | undefined;
     };
     parameters: (OpenAPIV3.ParameterObject | OpenAPIV3.ReferenceObject)[] | undefined;
-    resolvedRequestBodySchema: OpenAPIV3.SchemaObject;
+    resolvedRequestBodySchema: OpenAPIV3.SchemaObject | undefined;
     id: string;
-}[]>;
+}[] | undefined>;
 //# sourceMappingURL=getOperations.d.ts.map

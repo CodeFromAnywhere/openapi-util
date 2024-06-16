@@ -76,6 +76,7 @@ export const resolveOpenapiAppRequest = async (request, method, config) => {
         });
     }
     const parameters = pathItem.parameters || operation?.parameters;
+    console.log({ parameters });
     const resolvedParameters = parameters
         ? await Promise.all(parameters.map((parameter) => {
             return resolveReferenceOrContinue(parameter, openapi);
@@ -83,7 +84,7 @@ export const resolveOpenapiAppRequest = async (request, method, config) => {
         : undefined;
     const headers = resolvedParameters
         ? mergeObjectsArray(resolvedParameters
-            .filter((item) => item.in === "header")
+            .filter((item) => item?.in === "header")
             .map((x) => {
             const value = request.headers.get(x.name);
             console.log({ value });
@@ -101,7 +102,7 @@ export const resolveOpenapiAppRequest = async (request, method, config) => {
             .slice(1)
             .split("&")
             .map((x) => x.split("="))
-            .filter((x) => resolvedParameters?.find((item) => item.in === "query" && item.name === x[0]))
+            .filter((x) => resolvedParameters?.find((item) => item?.in === "query" && item.name === x[0]))
             .map((item) => {
             return { [item[0]]: item[1] };
         }))
@@ -153,7 +154,7 @@ export const resolveOpenapiAppRequest = async (request, method, config) => {
             ? undefined
             : { body: data };
     const context = { ...body, ...pathParams, ...queryParams, ...headers };
-    console.log({ context });
+    // console.log({ parameters, resolvedParameters, headers, context });
     // valid! Let's execute.
     const resultJson = await fn(context);
     return Response.json(resultJson, {

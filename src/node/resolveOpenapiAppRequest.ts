@@ -120,6 +120,8 @@ export const resolveOpenapiAppRequest = async (
 
   const parameters = pathItem.parameters || operation?.parameters;
 
+  console.log({ parameters });
+
   const resolvedParameters = parameters
     ? await Promise.all(
         parameters.map((parameter) => {
@@ -131,15 +133,15 @@ export const resolveOpenapiAppRequest = async (
   const headers = resolvedParameters
     ? mergeObjectsArray(
         resolvedParameters
-          .filter((item) => item.in === "header")
+          .filter((item) => item?.in === "header")
           .map((x) => {
-            const value = request.headers.get(x.name);
+            const value = request.headers.get(x!.name);
             console.log({ value });
             if (value === null) {
               // this could be a problem if it were required
               return;
             }
-            return { [x.name]: value };
+            return { [x!.name]: value };
           })
           .filter(notEmpty),
       )
@@ -154,7 +156,7 @@ export const resolveOpenapiAppRequest = async (
           .map((x) => x.split("=") as [string, string | undefined])
           .filter((x) =>
             resolvedParameters?.find(
-              (item) => item.in === "query" && item.name === x[0],
+              (item) => item?.in === "query" && item.name === x[0],
             ),
           )
           .map((item) => {
@@ -234,7 +236,7 @@ export const resolveOpenapiAppRequest = async (
 
   const context = { ...body, ...pathParams, ...queryParams, ...headers };
 
-  console.log({ context });
+  // console.log({ parameters, resolvedParameters, headers, context });
 
   // valid! Let's execute.
   const resultJson = await fn(context);
