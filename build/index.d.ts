@@ -8,4 +8,5 @@ export * from "./fetchOpenapi.js";
 export * from "./getFormContextFromOpenapi.js";
 export * from "./FromContext.js";
 export * from "./getOperationRequestInit.js";
+export * from "./getOpenapiOperations.js";
 //# sourceMappingURL=index.d.ts.map
