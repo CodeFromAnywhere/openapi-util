@@ -9,3 +9,4 @@ export * from "./getFormContextFromOpenapi.js";
 export * from "./FromContext.js";
 export * from "./getOperationRequestInit.js";
 export * from "./getOpenapiOperations.js";
+export * from "./resolveSchemaRecursive.js";

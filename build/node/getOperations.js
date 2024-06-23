@@ -3,7 +3,7 @@ import { resolveSchemaRecursive } from "../resolveSchemaRecursive.js";
 /**
  * Responds with the operations from an openapi document by looking in the paths and (next)-allowed methods
  *
- * TODO:Ensure `getOperations` resolves every `component/schemas` and remote ones. Maybe it's possible to do with some redocly function (or continue from `resolveResource`)
+ * TODO: Ensure `getOperations` resolves every `component/schemas` and remote ones. Maybe it's possible to do with some redocly function (or continue from `resolveResource`)
  */
 export const getOperations = async (openapi, openapiId, documentLocation) => {
     const resolved = (await resolveSchemaRecursive({
